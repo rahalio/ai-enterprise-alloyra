@@ -1,0 +1,994 @@
+openapi: 3.0.3
+info:
+  title: Alloyra
+  version: 0.1.0
+  description: 'Cognitive productization control plane for technology vendors: capability heat maps, build/buy/partner
+    bets, and platform vs PaaS go-to-market paths.'
+  x-product-slug: ai-enterprise-alloyra
+  x-source: ai-in-enterprise/deloitte-Cognitive-Technologies_Technology_MASTER/
+servers:
+- url: https://api.example.com
+tags:
+- name: Capabilities
+  description: Capability taxonomy
+- name: Heat Map
+  description: Competitive heat and signals
+- name: Bets
+  description: Product bets and posture
+- name: Platform Paths
+  description: Developer platform surfaces
+- name: PaaS Paths
+  description: PaaS extensions
+- name: CorpDev
+  description: M&A linkage
+- name: Portfolio
+  description: Concentration and board packs
+- name: Governance
+  description: Audit
+paths:
+  /v1/capabilities:
+    get:
+      operationId: listCapabilityClasses
+      tags:
+      - Capabilities
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Capabilities
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeCapabilityClass'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+  /v1/heat-map/snapshots:
+    get:
+      operationId: listHeatMapSnapshots
+      tags:
+      - Heat Map
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Snapshots
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeHeatMapSnapshot'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      operationId: createHeatMapSnapshot
+      tags:
+      - Heat Map
+      security:
+      - BearerAuth: []
+      responses:
+        '201':
+          description: Snapshot created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeHeatMapSnapshot'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HeatMapSnapshotCreate'
+  /v1/signals:
+    get:
+      operationId: listMarketSignals
+      tags:
+      - Heat Map
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Signals
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeMarketSignal'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      operationId: ingestMarketSignal
+      tags:
+      - Heat Map
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '201':
+          description: Signal ingested
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeMarketSignal'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MarketSignalCreate'
+  /v1/bets:
+    get:
+      operationId: listProductBets
+      tags:
+      - Bets
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Bets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeProductBet'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+      - name: status
+        in: query
+        schema:
+          type: string
+    post:
+      operationId: createProductBet
+      tags:
+      - Bets
+      security:
+      - BearerAuth: []
+      responses:
+        '201':
+          description: Bet created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeProductBet'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductBetCreate'
+  /v1/bets/{betId}:
+    parameters:
+    - name: betId
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      operationId: getProductBet
+      tags:
+      - Bets
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Bet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeProductBet'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/bets/{betId}/kill:
+    parameters:
+    - name: betId
+      in: path
+      required: true
+      schema:
+        type: string
+    post:
+      operationId: killProductBet
+      tags:
+      - Bets
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Bet killed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeProductBet'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KillBetRequest'
+  /v1/platform-surfaces:
+    get:
+      operationId: listPlatformSurfaces
+      tags:
+      - Platform Paths
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Surfaces
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopePlatformSurface'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      operationId: createPlatformSurface
+      tags:
+      - Platform Paths
+      security:
+      - BearerAuth: []
+      responses:
+        '201':
+          description: Surface created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopePlatformSurface'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlatformSurfaceCreate'
+  /v1/paas-extensions:
+    get:
+      operationId: listPaasExtensions
+      tags:
+      - PaaS Paths
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Extensions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopePaasExtension'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      operationId: createPaasExtension
+      tags:
+      - PaaS Paths
+      security:
+      - BearerAuth: []
+      responses:
+        '201':
+          description: Extension created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopePaasExtension'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaasExtensionCreate'
+  /v1/corpdev/opportunities:
+    post:
+      operationId: linkCorpDevOpportunity
+      tags:
+      - CorpDev
+      security:
+      - BearerAuth: []
+      responses:
+        '201':
+          description: Opportunity linked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeCorpDevOpportunity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CorpDevLinkCreate'
+  /v1/portfolio/board-packs:
+    get:
+      operationId: listBoardPacks
+      tags:
+      - Portfolio
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Board packs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeBoardPack'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+    post:
+      operationId: issueBoardPack
+      tags:
+      - Portfolio
+      security:
+      - BearerAuth: []
+      responses:
+        '201':
+          description: Board pack issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeBoardPack'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoardPackCreate'
+  /v1/governance/audit-entries:
+    get:
+      operationId: listAuditEntries
+      tags:
+      - Governance
+      security:
+      - BearerAuth: []
+      responses:
+        '200':
+          description: Audit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeAuditEntry'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Cursor:
+      name: cursor
+      in: query
+      schema:
+        type: string
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 25
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    UnprocessableEntity:
+      description: Unprocessable entity
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+  schemas:
+    ResponseMeta:
+      type: object
+      required:
+      - requestId
+      - timestamp
+      properties:
+        requestId:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+    Problem:
+      type: object
+      required:
+      - type
+      - title
+      - status
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+    CapabilityClass:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+    DataEnvelopeCapabilityClass:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/CapabilityClass'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeCapabilityClass:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/CapabilityClass'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    HeatMapSnapshot:
+      type: object
+      required:
+      - id
+      - period
+      properties:
+        id:
+          type: string
+        period:
+          type: string
+        scores:
+          type: object
+          additionalProperties:
+            type: number
+    DataEnvelopeHeatMapSnapshot:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/HeatMapSnapshot'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeHeatMapSnapshot:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/HeatMapSnapshot'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    MarketSignal:
+      type: object
+      required:
+      - id
+      - capabilityClassId
+      - signalType
+      properties:
+        id:
+          type: string
+        capabilityClassId:
+          type: string
+        signalType:
+          type: string
+          enum:
+          - mna
+          - launch
+          - partnership
+        summary:
+          type: string
+        occurredAt:
+          type: string
+          format: date-time
+    DataEnvelopeMarketSignal:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/MarketSignal'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeMarketSignal:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/MarketSignal'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ProductBet:
+      type: object
+      required:
+      - id
+      - capabilityClassId
+      - posture
+      - status
+      properties:
+        id:
+          type: string
+        capabilityClassId:
+          type: string
+        posture:
+          type: string
+          enum:
+          - build
+          - buy
+          - partner
+        gtmPath:
+          type: string
+          enum:
+          - platform
+          - paas
+        status:
+          type: string
+          enum:
+          - thesis
+          - committed
+          - ga
+          - killed
+        ownerId:
+          type: string
+    DataEnvelopeProductBet:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/ProductBet'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeProductBet:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProductBet'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    PlatformSurface:
+      type: object
+      required:
+      - id
+      - betId
+      - apiContractRef
+      properties:
+        id:
+          type: string
+        betId:
+          type: string
+        apiContractRef:
+          type: string
+        developerTarget:
+          type: integer
+    DataEnvelopePlatformSurface:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/PlatformSurface'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopePlatformSurface:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/PlatformSurface'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    PaasExtension:
+      type: object
+      required:
+      - id
+      - betId
+      - basePaas
+      properties:
+        id:
+          type: string
+        betId:
+          type: string
+        basePaas:
+          type: string
+        slaDependency:
+          type: string
+    DataEnvelopePaasExtension:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/PaasExtension'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopePaasExtension:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/PaasExtension'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    CorpDevOpportunity:
+      type: object
+      required:
+      - id
+      - betId
+      - status
+      properties:
+        id:
+          type: string
+        betId:
+          type: string
+        targetName:
+          type: string
+        status:
+          type: string
+          enum:
+          - linked
+          - diligence
+          - closed
+          - rejected
+    DataEnvelopeCorpDevOpportunity:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/CorpDevOpportunity'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeCorpDevOpportunity:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/CorpDevOpportunity'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    BoardPack:
+      type: object
+      required:
+      - id
+      - period
+      properties:
+        id:
+          type: string
+        period:
+          type: string
+        influencedRevenue:
+          type: number
+        openBets:
+          type: integer
+    DataEnvelopeBoardPack:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/BoardPack'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeBoardPack:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/BoardPack'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    AuditEntry:
+      type: object
+      required:
+      - id
+      - eventType
+      - occurredAt
+      properties:
+        id:
+          type: string
+        eventType:
+          type: string
+        occurredAt:
+          type: string
+          format: date-time
+    DataEnvelopeAuditEntry:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/AuditEntry'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeAuditEntry:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/AuditEntry'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ProductBetCreate:
+      type: object
+      required:
+      - capabilityClassId
+      - posture
+      - gtmPath
+      properties:
+        capabilityClassId:
+          type: string
+        posture:
+          type: string
+        gtmPath:
+          type: string
+        ownerId:
+          type: string
+        thesis:
+          type: string
+    MarketSignalCreate:
+      type: object
+      required:
+      - capabilityClassId
+      - signalType
+      - summary
+      properties:
+        capabilityClassId:
+          type: string
+        signalType:
+          type: string
+        summary:
+          type: string
+    PlatformSurfaceCreate:
+      type: object
+      required:
+      - betId
+      - apiContractRef
+      properties:
+        betId:
+          type: string
+        apiContractRef:
+          type: string
+        developerTarget:
+          type: integer
+    PaasExtensionCreate:
+      type: object
+      required:
+      - betId
+      - basePaas
+      properties:
+        betId:
+          type: string
+        basePaas:
+          type: string
+        slaDependency:
+          type: string
+    CorpDevLinkCreate:
+      type: object
+      required:
+      - betId
+      properties:
+        betId:
+          type: string
+        targetName:
+          type: string
+    BoardPackCreate:
+      type: object
+      required:
+      - period
+      properties:
+        period:
+          type: string
+        influencedRevenue:
+          type: number
+        openBets:
+          type: integer
+    KillBetRequest:
+      type: object
+      required:
+      - reason
+      properties:
+        reason:
+          type: string
+    HeatMapSnapshotCreate:
+      type: object
+      required:
+      - period
+      properties:
+        period:
+          type: string
+        scores:
+          type: object
+          additionalProperties:
+            type: number
